@@ -1,12 +1,37 @@
 import React , {useState} from 'react'
+import Error from './Error';
+import shortid from 'shortid';
+import PropTypes from 'prop-types';
 
-const Formulario = () => {
+const Formulario = ({setGasto, setCrearGasto}) => {
 
     const [nombre, setNombre] = useState('');
     const [cantidad, setCantidad] = useState(0);
+    const [error, setError] = useState(false);
+    
+
+    
 
     const agregarGasto = e => {
         e.preventDefault();
+
+        if(cantidad < 1 || isNaN(cantidad) || nombre.trim() === ''){
+            setError(true);
+            return;
+        }
+        setError(false);
+
+        const gasto = {
+            nombre,
+            cantidad,
+            id: shortid.generate()
+        }
+
+        setGasto(gasto);
+        setCrearGasto(true);
+
+        setNombre('');
+        setCantidad(0);
     }
 
     return (
@@ -15,6 +40,8 @@ const Formulario = () => {
         >
 
           <h2>Agrega tus gastos aqui</h2>  
+
+          { error ? <Error mensaje='Ambos campos son obligatorios o Presupuesto incorrecto' /> : null}
 
           <div className="campo">
               <label>Nombre Gasto</label>
@@ -34,7 +61,7 @@ const Formulario = () => {
                     className='u-full-width' 
                     placeholder='Ej. 300'
                     value={cantidad}
-                    onChange={e => setCantidad(parseInt(e.target.value, 10))}
+                    onChange={e => setCantidad(parseInt(e.target.value, 10) || '')}
                />
           </div>
 
@@ -45,6 +72,11 @@ const Formulario = () => {
 
         </form>
     )
+}
+
+Formulario.prototype = {
+    setGasto: PropTypes.func.isRequired,
+    setCrearGasto: PropTypes.func.isRequired,
 }
 
 export default Formulario
